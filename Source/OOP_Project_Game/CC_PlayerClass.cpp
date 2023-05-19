@@ -22,12 +22,16 @@ ACC_PlayerClass::ACC_PlayerClass()
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Movement = CreateDefaultSubobject<UFloatingPawnMovement>("Movement");
 	Sprite = CreateAbstractDefaultSubobject<UPaperFlipbookComponent>("Sprite");
-	SetRootComponent(Collider);
+
+	DummyRoot = CreateDefaultSubobject<USceneComponent>("Root");
+	SetRootComponent(DummyRoot);
+	//SetRootComponent(Collider);
 
 	//Attaching objects to each other
 	//Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	//SpringArm->SetupAttachment(Collider);
-	//Sprite->SetupAttachment(Collider);
+	Sprite->SetupAttachment(DummyRoot);
+	Collider->SetupAttachment(DummyRoot);
 
 	//Setting starting sprite
 	Sprite->Stop();
@@ -56,7 +60,7 @@ void ACC_PlayerClass::BeginPlay()
 	ObjTraceChannel.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
 	Collider->OnComponentHit.AddDynamic(this, &ACC_PlayerClass::OnHitEnemy);
 	Collider->OnComponentBeginOverlap.AddDynamic(this, &ACC_PlayerClass::OnOverlapEnemy);
-	MouseLocation.Z = 0;
+	MouseLocation.Z = GetActorLocation().Z;
 
 	//Temporary
 	FVector CamLoc;
@@ -81,7 +85,7 @@ void ACC_PlayerClass::Shoot(const FInputActionValue& Value)
 	//FTransform SpawnTransform;
 	//SpawnTransform.SetRotation(UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), MouseLocation));
 	//SpawnTransform.SetLocation(GetActorLocation() + GetActorForwardVector() * 100);
-	GetWorld()->SpawnActor<AActor>(Ammo, this->GetActorLocation()+UKismetMathLibrary::GetForwardVector(ShootingDirection)+10, ShootingDirection, SP);
+	GetWorld()->SpawnActor<AActor>(Ammo, this->GetActorLocation()+UKismetMathLibrary::GetForwardVector(ShootingDirection)*20, ShootingDirection, SP);
 	
 	//How to call a function from object
 	//ABulletDef* BulletActor = Cast<ABulletDef>(GetWorld()->SpawnActor<AActor>(Ammo, SpawnTransform, SP));

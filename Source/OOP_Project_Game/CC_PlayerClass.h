@@ -52,6 +52,8 @@ protected:
 		class UCameraComponent* Camera;
 	UPROPERTY(EditAnywhere)
 		class UPaperFlipbookComponent* Sprite;
+	UPROPERTY()
+		class USceneComponent *DummyRoot;
 	//End of structure.....................................
 	
 	//Input.....................................

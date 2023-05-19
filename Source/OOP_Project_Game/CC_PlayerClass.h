@@ -48,7 +48,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 		class USpringArmComponent* SpringArm;
 	*/
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class UCameraComponent* Camera;
 	UPROPERTY(EditAnywhere)
 		class UPaperFlipbookComponent* Sprite;

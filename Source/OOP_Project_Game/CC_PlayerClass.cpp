@@ -27,7 +27,7 @@ ACC_PlayerClass::ACC_PlayerClass()
 	//Attaching objects to each other
 	//Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	//SpringArm->SetupAttachment(Collider);
-	Sprite->SetupAttachment(Collider);
+	//Sprite->SetupAttachment(Collider);
 
 	//Setting starting sprite
 	Sprite->Stop();
@@ -57,12 +57,22 @@ void ACC_PlayerClass::BeginPlay()
 	Collider->OnComponentHit.AddDynamic(this, &ACC_PlayerClass::OnHitEnemy);
 	Collider->OnComponentBeginOverlap.AddDynamic(this, &ACC_PlayerClass::OnOverlapEnemy);
 	MouseLocation.Z = 0;
+
+	//Temporary
+	FVector CamLoc;
+	CamLoc.Set(0 ,0, 150);
+	Camera->SetWorldLocation(CamLoc);
 }
 
 
 //Spawning bullet
 void ACC_PlayerClass::Shoot(const FInputActionValue& Value)
 {
+	//Getting location in world where to shoot
+	PC->GetHitResultUnderCursorForObjects(ObjTraceChannel, true, HitResult);
+	MouseLocation.X = HitResult.Location.X;
+	MouseLocation.Y = HitResult.Location.Y;
+
 	const bool ShootValue = Value.Get<bool>();
 	if (ShootValue) GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "PEW");
 	FActorSpawnParameters SP;
@@ -129,10 +139,19 @@ void ACC_PlayerClass::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//Getting location in world where to shoot
-	PC->GetHitResultUnderCursorForObjects(ObjTraceChannel, true, HitResult);
-	MouseLocation.X = HitResult.Location.X;
-	MouseLocation.Y = HitResult.Location.Y;
+	//Temporary camera movement system
+	if (abs(Camera->GetComponentLocation().X - this->GetActorLocation().X) > 200)
+	{
+		FVector camposnew = this->GetActorLocation();
+		camposnew.Z = 150;
+		Camera->SetWorldLocation(camposnew);
+	}
+	if (abs(Camera->GetComponentLocation().Y - this->GetActorLocation().Y) > 200)
+	{
+		FVector camposnew = this->GetActorLocation();
+		camposnew.Z = 150;
+		Camera->SetWorldLocation(camposnew);
+	}
 }
 
 // Called to bind functionality to input

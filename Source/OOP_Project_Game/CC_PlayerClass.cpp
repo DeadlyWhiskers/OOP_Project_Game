@@ -38,8 +38,6 @@ ACC_PlayerClass::ACC_PlayerClass()
 
 	//Setting starting sprite
 	Sprite->Stop();
-	ShootFlash->SetFlipbook(ShootFlashFB);
-	ShootFlash->Stop();
 	Sprite->SetFlipbook(MoveDown);
 	Sprite->SetPlaybackPositionInFrames(2, false);
 
@@ -67,6 +65,11 @@ void ACC_PlayerClass::BeginPlay()
 	Collider->OnComponentBeginOverlap.AddDynamic(this, &ACC_PlayerClass::OnOverlapEnemy);
 	MouseLocation.Z = GetActorLocation().Z;
 
+	//Flash animation
+	ShootFlash->SetFlipbook(FlashFlipbook);
+	ShootFlash->SetLooping(false);
+	ShootFlash->SetPlaybackPositionInFrames(5, false);
+
 	//Temporary
 	FVector CamLoc;
 	CamLoc.Set(0 ,0, 150);
@@ -77,10 +80,16 @@ void ACC_PlayerClass::BeginPlay()
 //Spawning bullet
 void ACC_PlayerClass::Shoot(const FInputActionValue& Value)
 {
+	//!!!Transfer this function to weapon class!!!
+	int recoil = 8;
+
 	//Getting location in world where to shoot
 	PC->GetHitResultUnderCursorForObjects(ObjTraceChannel, true, HitResult);
 	MouseLocation.X = HitResult.Location.X;
 	MouseLocation.Y = HitResult.Location.Y;
+
+	//Sprite animating
+	ShootFlash->PlayFromStart();
 
 	const bool ShootValue = Value.Get<bool>();
 	if (ShootValue) GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "PEW");
@@ -90,7 +99,9 @@ void ACC_PlayerClass::Shoot(const FInputActionValue& Value)
 	//FTransform SpawnTransform;
 	//SpawnTransform.SetRotation(UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), MouseLocation));
 	//SpawnTransform.SetLocation(GetActorLocation() + GetActorForwardVector() * 100);
-	GetWorld()->SpawnActor<AActor>(Ammo, this->GetActorLocation()+UKismetMathLibrary::GetForwardVector(ShootingDirection)*20, ShootingDirection, SP);
+	GetWorld()->SpawnActor<AActor>(Ammo, Sprite->GetSocketLocation("Flash") + UKismetMathLibrary::GetForwardVector(ShootingDirection) * 1, ShootingDirection, SP);
+	//Recoil test
+	AddMovementInput(UKismetMathLibrary::GetForwardVector(ShootingDirection)*-1, GetWorld()->GetDeltaSeconds() * recoil);
 	
 	//How to call a function from object
 	//ABulletDef* BulletActor = Cast<ABulletDef>(GetWorld()->SpawnActor<AActor>(Ammo, SpawnTransform, SP));

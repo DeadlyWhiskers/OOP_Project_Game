@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "CC_PlayerClass.h"
@@ -22,6 +22,7 @@ ACC_PlayerClass::ACC_PlayerClass()
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Movement = CreateDefaultSubobject<UFloatingPawnMovement>("Movement");
 	Sprite = CreateAbstractDefaultSubobject<UPaperFlipbookComponent>("Sprite");
+	ShootFlash = CreateAbstractDefaultSubobject<UPaperFlipbookComponent>("Flash");
 
 	DummyRoot = CreateDefaultSubobject<USceneComponent>("Root");
 	SetRootComponent(DummyRoot);
@@ -32,9 +33,12 @@ ACC_PlayerClass::ACC_PlayerClass()
 	//SpringArm->SetupAttachment(Collider);
 	Sprite->SetupAttachment(DummyRoot);
 	Collider->SetupAttachment(DummyRoot);
+	Camera->SetupAttachment(DummyRoot);
+	ShootFlash->SetupAttachment(Sprite, "Flash");
 
 	//Setting starting sprite
 	Sprite->Stop();
+	ShootFlash->Stop();
 	Sprite->SetFlipbook(MoveDown);
 	Sprite->SetPlaybackPositionInFrames(2, false);
 
@@ -195,7 +199,7 @@ void ACC_PlayerClass::OnOverlapEnemy(UPrimitiveComponent* OverlappedComponent, A
 		if (!health) Destroy();
 	}*/
 
-	//Ñàìûé æ¸ñòêèé â ìèðå êîñòûëü, íî òàêîé ðàáî÷èé è óäîáíûé))
+	//Ð¡Ð°Ð¼Ñ‹Ð¹ Ð¶Ñ‘ÑÑ‚ÐºÐ¸Ð¹ Ð² Ð¼Ð¸Ñ€Ðµ ÐºÐ¾ÑÑ‚Ñ‹Ð»ÑŒ, Ð½Ð¾ Ñ‚Ð°ÐºÐ¾Ð¹ Ñ€Ð°Ð±Ð¾Ñ‡Ð¸Ð¹ Ð¸ ÑƒÐ´Ð¾Ð±Ð½Ñ‹Ð¹))
 	/*if (OtherActor->GetClass()->GetName() == "target_C")
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, FString::Printf(TEXT("%s"), *OtherActor->GetClass()->GetName()));

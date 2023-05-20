@@ -52,6 +52,10 @@ protected:
 		class UCameraComponent* Camera;
 	UPROPERTY(EditAnywhere)
 		class UPaperFlipbookComponent* Sprite;
+	UPROPERTY(EditAnywhere)
+		class UPaperFlipbookComponent* ShootFlash;
+	UPROPERTY(EditAnywhere)
+		class USceneComponent *DummyRoot;
 	//End of structure.....................................
 	
 	//Input.....................................
@@ -78,15 +82,17 @@ protected:
 		FVector MousePos;
 
 	//Sprites.....................................
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* FlashFlipbook;
+	UPROPERTY(EditAnywhere, Category = "Sprites")
 		UPaperFlipbook* DefaultPose;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Sprites")
 		UPaperFlipbook* MoveUp;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Sprites")
 		UPaperFlipbook* MoveDown;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Sprites")
 		UPaperFlipbook* MoveLeft;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Sprites")
 		UPaperFlipbook* MoveRight;
 	//End Of sprites.....................................
 

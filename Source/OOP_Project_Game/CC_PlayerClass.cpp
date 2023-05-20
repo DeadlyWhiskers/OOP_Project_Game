@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "CC_PlayerClass.h"
@@ -22,12 +22,19 @@ ACC_PlayerClass::ACC_PlayerClass()
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Movement = CreateDefaultSubobject<UFloatingPawnMovement>("Movement");
 	Sprite = CreateAbstractDefaultSubobject<UPaperFlipbookComponent>("Sprite");
-	SetRootComponent(Collider);
+	ShootFlash = CreateAbstractDefaultSubobject<UPaperFlipbookComponent>("Flash");
+
+	DummyRoot = CreateDefaultSubobject<USceneComponent>("Root");
+	SetRootComponent(DummyRoot);
+	//SetRootComponent(Collider);
 
 	//Attaching objects to each other
 	//Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	//SpringArm->SetupAttachment(Collider);
-	//Sprite->SetupAttachment(Collider);
+	Sprite->SetupAttachment(DummyRoot);
+	Collider->SetupAttachment(DummyRoot);
+	Camera->SetupAttachment(DummyRoot);
+	ShootFlash->SetupAttachment(Sprite, "Flash");
 
 	//Setting starting sprite
 	Sprite->Stop();
@@ -56,7 +63,12 @@ void ACC_PlayerClass::BeginPlay()
 	ObjTraceChannel.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
 	Collider->OnComponentHit.AddDynamic(this, &ACC_PlayerClass::OnHitEnemy);
 	Collider->OnComponentBeginOverlap.AddDynamic(this, &ACC_PlayerClass::OnOverlapEnemy);
-	MouseLocation.Z = 0;
+	MouseLocation.Z = GetActorLocation().Z;
+
+	//Flash animation
+	ShootFlash->SetFlipbook(FlashFlipbook);
+	ShootFlash->SetLooping(false);
+	ShootFlash->SetPlaybackPositionInFrames(5, false);
 
 	//Temporary
 	FVector CamLoc;
@@ -68,10 +80,16 @@ void ACC_PlayerClass::BeginPlay()
 //Spawning bullet
 void ACC_PlayerClass::Shoot(const FInputActionValue& Value)
 {
+	//!!!Transfer this function to weapon class!!!
+	int recoil = 8;
+
 	//Getting location in world where to shoot
 	PC->GetHitResultUnderCursorForObjects(ObjTraceChannel, true, HitResult);
 	MouseLocation.X = HitResult.Location.X;
 	MouseLocation.Y = HitResult.Location.Y;
+
+	//Sprite animating
+	ShootFlash->PlayFromStart();
 
 	const bool ShootValue = Value.Get<bool>();
 	if (ShootValue) GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "PEW");
@@ -81,7 +99,9 @@ void ACC_PlayerClass::Shoot(const FInputActionValue& Value)
 	//FTransform SpawnTransform;
 	//SpawnTransform.SetRotation(UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), MouseLocation));
 	//SpawnTransform.SetLocation(GetActorLocation() + GetActorForwardVector() * 100);
-	GetWorld()->SpawnActor<AActor>(Ammo, this->GetActorLocation()+UKismetMathLibrary::GetForwardVector(ShootingDirection)+10, ShootingDirection, SP);
+	GetWorld()->SpawnActor<AActor>(Ammo, Sprite->GetSocketLocation("Flash") + UKismetMathLibrary::GetForwardVector(ShootingDirection) * 1, ShootingDirection, SP);
+	//Recoil test
+	AddMovementInput(UKismetMathLibrary::GetForwardVector(ShootingDirection)*-1, GetWorld()->GetDeltaSeconds() * recoil);
 	
 	//How to call a function from object
 	//ABulletDef* BulletActor = Cast<ABulletDef>(GetWorld()->SpawnActor<AActor>(Ammo, SpawnTransform, SP));
@@ -191,7 +211,7 @@ void ACC_PlayerClass::OnOverlapEnemy(UPrimitiveComponent* OverlappedComponent, A
 		if (!health) Destroy();
 	}*/
 
-	//Ñàìûé æ¸ñòêèé â ìèðå êîñòûëü, íî òàêîé ðàáî÷èé è óäîáíûé))
+	//Ð¡Ð°Ð¼Ñ‹Ð¹ Ð¶Ñ‘ÑÑ‚ÐºÐ¸Ð¹ Ð² Ð¼Ð¸Ñ€Ðµ ÐºÐ¾ÑÑ‚Ñ‹Ð»ÑŒ, Ð½Ð¾ Ñ‚Ð°ÐºÐ¾Ð¹ Ñ€Ð°Ð±Ð¾Ñ‡Ð¸Ð¹ Ð¸ ÑƒÐ´Ð¾Ð±Ð½Ñ‹Ð¹))
 	/*if (OtherActor->GetClass()->GetName() == "target_C")
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, FString::Printf(TEXT("%s"), *OtherActor->GetClass()->GetName()));

@@ -92,6 +92,8 @@ protected:
 		UPaperFlipbook* MoveLeft;
 	UPROPERTY(EditAnywhere)
 		UPaperFlipbook* MoveRight;
+	UPROPERTY(EditAnywhere)
+		UPaperFlipbook* ShootFlashFB;
 	//End Of sprites.....................................
 
 	//Overlaps.....................................

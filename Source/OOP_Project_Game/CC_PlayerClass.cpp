@@ -38,6 +38,7 @@ ACC_PlayerClass::ACC_PlayerClass()
 
 	//Setting starting sprite
 	Sprite->Stop();
+	ShootFlash->SetFlipbook(ShootFlashFB);
 	ShootFlash->Stop();
 	Sprite->SetFlipbook(MoveDown);
 	Sprite->SetPlaybackPositionInFrames(2, false);

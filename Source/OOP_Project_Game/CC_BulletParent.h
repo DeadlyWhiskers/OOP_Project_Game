@@ -2,16 +2,17 @@
 
 #pragma once
 
-
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
 #include "CC_BulletParent.generated.h"
 
 UCLASS()
-class OOP_PROJECT_GAME_API ACC_BulletParent : public APawn
+class OOP_PROJECT_GAME_API ACC_BulletParent : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
+	// Sets default values for this actor's properties
 	ACC_BulletParent();
 
 protected:

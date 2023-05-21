@@ -31,6 +31,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	APlayerController* PC;
+	FVector CameraLocation;
+
+	//Move to weapon class
+	int Recoil = 8, Scatter = 7, ReloadTime = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector MouseLocation;
@@ -50,7 +54,7 @@ protected:
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class UCameraComponent* Camera;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class UPaperFlipbookComponent* Sprite;
 	UPROPERTY(EditAnywhere)
 		class UPaperFlipbookComponent* ShootFlash;

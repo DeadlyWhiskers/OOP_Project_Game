@@ -52,6 +52,7 @@ void ACC_PlayerClass::BeginPlay()
 {
 	Super::BeginPlay();
 	PC = Cast<APlayerController>(GetController());
+	srand(time(NULL));
 	if (PC)
 	{
 		PC->bShowMouseCursor = true;
@@ -71,9 +72,8 @@ void ACC_PlayerClass::BeginPlay()
 	ShootFlash->SetPlaybackPositionInFrames(5, false);
 
 	//Temporary
-	FVector CamLoc;
-	CamLoc.Set(0 ,0, 150);
-	Camera->SetWorldLocation(CamLoc);
+	CameraLocation.Set(this->GetActorLocation().X, this->GetActorLocation().Y, 150);
+	Camera->SetWorldLocation(CameraLocation);
 }
 
 
@@ -81,7 +81,8 @@ void ACC_PlayerClass::BeginPlay()
 void ACC_PlayerClass::Shoot(const FInputActionValue& Value)
 {
 	//!!!Transfer this function to weapon class!!!
-	int recoil = 8;
+	FVector MuzzleLocation = Sprite->GetSocketLocation("Flash");
+	MuzzleLocation.Z = this->GetActorLocation().Z;
 
 	//Getting location in world where to shoot
 	PC->GetHitResultUnderCursorForObjects(ObjTraceChannel, true, HitResult);
@@ -95,17 +96,26 @@ void ACC_PlayerClass::Shoot(const FInputActionValue& Value)
 	if (ShootValue) GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "PEW");
 	FActorSpawnParameters SP;
 	SP.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-	FRotator ShootingDirection = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), MouseLocation);
+	FRotator ShootingDirection = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, MouseLocation);
+
+	//Scattering
+	ShootingDirection.Yaw += -Scatter + rand() % Scatter*2+1;
 	//FTransform SpawnTransform;
 	//SpawnTransform.SetRotation(UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), MouseLocation));
 	//SpawnTransform.SetLocation(GetActorLocation() + GetActorForwardVector() * 100);
 	GetWorld()->SpawnActor<AActor>(Ammo, Sprite->GetSocketLocation("Flash") + UKismetMathLibrary::GetForwardVector(ShootingDirection) * 1, ShootingDirection, SP);
 	//Recoil test
-	AddMovementInput(UKismetMathLibrary::GetForwardVector(ShootingDirection)*-1, GetWorld()->GetDeltaSeconds() * recoil);
+	AddMovementInput(UKismetMathLibrary::GetForwardVector(ShootingDirection)*-1, GetWorld()->GetDeltaSeconds() * Recoil);
 	
 	//How to call a function from object
 	//ABulletDef* BulletActor = Cast<ABulletDef>(GetWorld()->SpawnActor<AActor>(Ammo, SpawnTransform, SP));
 	//BulletActor->SomeStupidFunction();
+
+	//Camera recoil
+	if ((Camera->GetComponentLocation() - CameraLocation).Length() <= 15)
+	{
+		Camera->AddWorldOffset(UKismetMathLibrary::GetForwardVector(ShootingDirection) * -1 * Recoil/2.25);
+	}
 }
 
 //Moving player
@@ -160,18 +170,23 @@ void ACC_PlayerClass::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//Temporary camera movement system
-	if (abs(Camera->GetComponentLocation().X - this->GetActorLocation().X) > 200)
+	FVector DistanceVector = CameraLocation - this->GetActorLocation();
+	DistanceVector.Z = 0;
+	if (DistanceVector.Length() > 200)
 	{
-		FVector camposnew = this->GetActorLocation();
-		camposnew.Z = 150;
-		Camera->SetWorldLocation(camposnew);
+		CameraLocation = this->GetActorLocation();
+		CameraLocation.Z = 150;
+		Camera->SetWorldLocation(CameraLocation);
 	}
-	if (abs(Camera->GetComponentLocation().Y - this->GetActorLocation().Y) > 200)
+
+	//Recoil movement restoration
+	int CamRecoil = (Camera->GetComponentLocation() - CameraLocation).Length();
+	if (CamRecoil > 0)
 	{
-		FVector camposnew = this->GetActorLocation();
-		camposnew.Z = 150;
-		Camera->SetWorldLocation(camposnew);
+		//UKismetMathLibrary::FindLookAtRotation(CameraLocation, Camera->GetComponentLocation());
+		Camera->AddWorldOffset((CameraLocation - Camera->GetComponentLocation()).GetSafeNormal()*DeltaTime*15* (sqrt(CamRecoil)/3+1));
 	}
+	
 }
 
 // Called to bind functionality to input

@@ -34,7 +34,9 @@ protected:
 	FVector CameraLocation;
 
 	//Move to weapon class
-	int Recoil = 8, Scatter = 7, ReloadTime = 0;
+	double MaxScatter = 7.5, ScatterForce = 2.5, Scatter = 0;
+	int Recoil = 8, ReloadTime = 20, ReloadProgress = 0;
+	bool isAutomatic = 1, ShotDone = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector MouseLocation;
@@ -110,6 +112,7 @@ protected:
 
 	//ActionFunctions.....................................
 	void Shoot(const FInputActionValue& Value);
+	void ShootEnd(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
 	void Rotate(const FInputActionValue& Value);
 	//End of action functions.....................................

@@ -14,7 +14,7 @@ class UCameraComponent;
 class OOP_PROJECT_GAME_API CC_Weapon
 {
 protected:
-	double MaxScatter, ScatterForce, Scatter;
+	double MaxScatter, MinScatter, ScatterForce, Scatter;
 	int Recoil, ReloadTime, ReloadProgress;
 	bool isAutomatic, ShotDone;
 	TSubclassOf<AActor> Ammo;
@@ -49,6 +49,8 @@ public:
 
 class CC_Shotgun : public CC_Weapon
 {
+protected:
+	int NumOfBullets;
 public:
 	void Shoot(FVector MouseLocation) override;
 	CC_Shotgun(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType);

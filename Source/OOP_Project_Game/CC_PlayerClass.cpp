@@ -42,8 +42,8 @@ ACC_PlayerClass::ACC_PlayerClass()
 	Sprite->SetPlaybackPositionInFrames(2, false);
 
 	//Creating sharp movement
-	Movement->Acceleration = 50000;
-	Movement->Deceleration = 50000;
+	Movement->Acceleration = 25000;
+	Movement->Deceleration = 35000;
 	
 }
 

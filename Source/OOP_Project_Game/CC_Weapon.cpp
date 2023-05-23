@@ -16,6 +16,7 @@ CC_Weapon::CC_Weapon(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoT
 	Sprite = WeaponOwner->getSprite();
 	ShootFlash = WeaponOwner->getShootFlash();
 	CameraLocation = WeaponOwner->getCameraLocation();
+	MinScatter = 0;
 }
 
 CC_Weapon::~CC_Weapon()
@@ -67,7 +68,7 @@ void CC_Shotgun::Shoot(FVector MouseLocation)
 		ReloadProgress = ReloadTime;
 		FVector MuzzleLocation = Sprite->GetSocketLocation("Flash");
 		MuzzleLocation.Z = WeaponOwner->GetActorLocation().Z;
-		Scatter = 2;
+		Scatter = MinScatter;
 
 		//Sprite animating
 		ShootFlash->PlayFromStart();
@@ -76,11 +77,11 @@ void CC_Shotgun::Shoot(FVector MouseLocation)
 		FRotator ShootingDirection = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, MouseLocation);
 
 		//Scattering
-		for(int i = 0; i<5; i++)
+		for(int i = 0; i<NumOfBullets; i++)
 		{
-			Scatter += (MaxScatter-2) / 5;
+			Scatter += ScatterForce;
 			if (Scatter != 0) ShootingDirection.Yaw += -Scatter + (rand() % ((int)Scatter * 2 + 1));
-			WeaponOwner->GetWorld()->SpawnActor<AActor>(Ammo, Sprite->GetSocketLocation("Flash") + UKismetMathLibrary::GetForwardVector(ShootingDirection) * ((double)rand()/RAND_MAX)*5, ShootingDirection, SP);
+			WeaponOwner->GetWorld()->SpawnActor<AActor>(Ammo, Sprite->GetSocketLocation("Flash") + UKismetMathLibrary::GetForwardVector(ShootingDirection) * ((double)rand()/RAND_MAX)*8, ShootingDirection, SP);
 			WeaponOwner->AddMovementInput(UKismetMathLibrary::GetForwardVector(ShootingDirection) * -1, WeaponOwner->GetWorld()->GetDeltaSeconds() * Recoil);
 		}
 		//How to call a function from object
@@ -98,8 +99,8 @@ void CC_Shotgun::Shoot(FVector MouseLocation)
 
 void CC_Weapon::CoolDown()
 {
-	if (Scatter > 0) Scatter -= 0.1;
-	else if (Scatter < 0) Scatter = 0;
+	if (Scatter > MinScatter) Scatter -= 0.1;
+	else if (Scatter < MinScatter) Scatter = MinScatter;
 }
 
 void CC_Weapon::ShootEnd()
@@ -145,8 +146,10 @@ CC_AssaultRifle::CC_AssaultRifle(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<A
 
 CC_Shotgun::CC_Shotgun(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType) : CC_Weapon(thisWeaponOwner, AmmoType)
 {
+	MinScatter = 2;
 	MaxScatter = 10;
-	ScatterForce = 10;
+	NumOfBullets = 5;
+	ScatterForce = (MaxScatter-MinScatter)/NumOfBullets;
 	Scatter = 0;
 	Recoil = 15;
 	ReloadTime = 40;

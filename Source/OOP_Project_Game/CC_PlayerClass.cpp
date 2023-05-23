@@ -208,6 +208,26 @@ void ACC_PlayerClass::Tick(float DeltaTime)
 	if (Scatter > 0) Scatter -= 0.1;
 }
 
+UPaperFlipbookComponent* ACC_PlayerClass::getSprite()
+{
+	return Sprite;
+}
+
+UPaperFlipbookComponent* ACC_PlayerClass::getShootFlash()
+{
+	return ShootFlash;
+}
+
+UCameraComponent* ACC_PlayerClass::getCamera()
+{
+	return Camera;
+}
+
+FVector ACC_PlayerClass::getCameraLocation()
+{
+	return CameraLocation;
+}
+
 // Called to bind functionality to input
 void ACC_PlayerClass::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

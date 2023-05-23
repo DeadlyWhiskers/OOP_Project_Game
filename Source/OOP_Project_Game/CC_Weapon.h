@@ -16,10 +16,14 @@ protected:
 	bool isAutomatic, ShotDone;
 	TSubclassOf<AActor> Ammo;
 	ACC_PlayerClass* WeaponOwner;
+	UPaperFlipbookComponent* Sprite,* ShootFlash;
+	UCameraComponent* Camera;
+	FVector CameraLocation;
+
 public:
 	CC_Weapon();
 	CC_Weapon(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType);
-	virtual void Shoot(FVector MousePosition);
+	virtual void Shoot(FVector MouseLocation);
 	void CoolDown();
 	void Reload();
 	virtual ~CC_Weapon();
@@ -29,4 +33,10 @@ class CC_Pistol : public CC_Weapon
 {
 	CC_Pistol(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType);
 	~CC_Pistol();
+};
+
+class CC_AssaultRifle : public CC_Weapon
+{
+	CC_AssaultRifle(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType);
+	~CC_AssaultRifle();
 };

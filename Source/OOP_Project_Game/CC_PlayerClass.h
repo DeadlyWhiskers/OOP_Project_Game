@@ -15,6 +15,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "PaperFlipbookComponent.h"
+#include "CC_Weapon.h"
 
 #include "CC_PlayerClass.generated.h"
 
@@ -32,6 +33,7 @@ protected:
 	virtual void BeginPlay() override;
 	APlayerController* PC;
 	FVector CameraLocation;
+
 
 	//Move to weapon class
 	double MaxScatter = 7.5, ScatterForce = 2.5, Scatter = 0;
@@ -122,6 +124,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPaperFlipbookComponent* getSprite();
+	UPaperFlipbookComponent* getShootFlash();
+	UCameraComponent* getCamera();
+	FVector getCameraLocation();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

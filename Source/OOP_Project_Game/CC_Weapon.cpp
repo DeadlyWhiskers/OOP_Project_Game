@@ -2,6 +2,7 @@
 
 
 #include "CC_Weapon.h"
+#include "CC_PlayerClass.h"
 
 CC_Weapon::CC_Weapon()
 {
@@ -62,6 +63,11 @@ void CC_Weapon::CoolDown()
 {
 	if (Scatter > 0) Scatter -= 0.1;
 	else if (Scatter < 0) Scatter = 0;
+}
+
+void CC_Weapon::ShootEnd()
+{
+	ShotDone = 0;
 }
 
 void CC_Weapon::Reload()

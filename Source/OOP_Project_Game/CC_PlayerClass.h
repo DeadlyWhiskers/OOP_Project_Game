@@ -34,6 +34,7 @@ protected:
 	APlayerController* PC;
 	FVector CameraLocation;
 
+	CC_Weapon* CurrentWeapon, * AssaultRifle, * Pistol;
 
 	//Move to weapon class
 	double MaxScatter = 7.5, ScatterForce = 2.5, Scatter = 0;

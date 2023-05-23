@@ -3,7 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CC_PlayerClass.h"
+
+class ACC_PlayerClass;
+class UPaperFlipbookComponent;
+class UCameraComponent;
 
 /**
  * 
@@ -26,17 +29,20 @@ public:
 	virtual void Shoot(FVector MouseLocation);
 	void CoolDown();
 	void Reload();
+	void ShootEnd();
 	virtual ~CC_Weapon();
 };
 
 class CC_Pistol : public CC_Weapon
 {
+public:
 	CC_Pistol(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType);
 	~CC_Pistol();
 };
 
 class CC_AssaultRifle : public CC_Weapon
 {
+public:
 	CC_AssaultRifle(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType);
 	~CC_AssaultRifle();
 };

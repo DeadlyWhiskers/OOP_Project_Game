@@ -78,7 +78,8 @@ void ACC_PlayerClass::BeginPlay()
 	//Weapon setting up
 	Pistol = new CC_Pistol(this, Ammo);
 	AssaultRifle = new CC_AssaultRifle(this, Ammo);
-	CurrentWeapon = AssaultRifle;
+	Shotgun = new CC_Shotgun(this, Ammo);
+	CurrentWeapon = Shotgun;
 }
 
 
@@ -187,9 +188,9 @@ UCameraComponent* ACC_PlayerClass::getCamera()
 	return Camera;
 }
 
-FVector ACC_PlayerClass::getCameraLocation()
+FVector* ACC_PlayerClass::getCameraLocation()
 {
-	return CameraLocation;
+	return &CameraLocation;
 }
 
 // Called to bind functionality to input

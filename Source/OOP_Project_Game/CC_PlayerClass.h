@@ -34,7 +34,7 @@ protected:
 	APlayerController* PC;
 	FVector CameraLocation;
 
-	CC_Weapon* CurrentWeapon, * AssaultRifle, * Pistol;
+	CC_Weapon* CurrentWeapon, * AssaultRifle, * Pistol, *Shotgun;
 
 	//Move to weapon class
 	double MaxScatter = 7.5, ScatterForce = 2.5, Scatter = 0;
@@ -129,7 +129,7 @@ public:
 	UPaperFlipbookComponent* getSprite();
 	UPaperFlipbookComponent* getShootFlash();
 	UCameraComponent* getCamera();
-	FVector getCameraLocation();
+	FVector* getCameraLocation();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

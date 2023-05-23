@@ -52,12 +52,49 @@ void CC_Weapon::Shoot(FVector MouseLocation)
 		//BulletActor->SomeStupidFunction();
 
 		//Camera recoil
-		if ((Camera->GetComponentLocation() - CameraLocation).Length() <= 15)
+		if ((Camera->GetComponentLocation() - *CameraLocation).Length() <= 15)
 		{
 			Camera->AddWorldOffset(UKismetMathLibrary::GetForwardVector(ShootingDirection) * -1 * Recoil / 2.25);
 		}
 	}
 }
+
+void CC_Shotgun::Shoot(FVector MouseLocation)
+{
+	if (ShotDone == 0 && ReloadProgress == 0)
+	{
+		if (!isAutomatic) ShotDone = 1;
+		ReloadProgress = ReloadTime;
+		FVector MuzzleLocation = Sprite->GetSocketLocation("Flash");
+		MuzzleLocation.Z = WeaponOwner->GetActorLocation().Z;
+		Scatter = 2;
+
+		//Sprite animating
+		ShootFlash->PlayFromStart();
+		FActorSpawnParameters SP;
+		SP.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+		FRotator ShootingDirection = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, MouseLocation);
+
+		//Scattering
+		for(int i = 0; i<5; i++)
+		{
+			Scatter += (MaxScatter-2) / 5;
+			if (Scatter != 0) ShootingDirection.Yaw += -Scatter + (rand() % ((int)Scatter * 2 + 1));
+			WeaponOwner->GetWorld()->SpawnActor<AActor>(Ammo, Sprite->GetSocketLocation("Flash") + UKismetMathLibrary::GetForwardVector(ShootingDirection) * ((double)rand()/RAND_MAX)*5, ShootingDirection, SP);
+			WeaponOwner->AddMovementInput(UKismetMathLibrary::GetForwardVector(ShootingDirection) * -1, WeaponOwner->GetWorld()->GetDeltaSeconds() * Recoil);
+		}
+		//How to call a function from object
+		//ABulletDef* BulletActor = Cast<ABulletDef>(GetWorld()->SpawnActor<AActor>(Ammo, SpawnTransform, SP));
+		//BulletActor->SomeStupidFunction();
+
+		//Camera recoil
+		if ((Camera->GetComponentLocation() - *CameraLocation).Length() <= 15)
+		{
+			Camera->AddWorldOffset(UKismetMathLibrary::GetForwardVector(ShootingDirection) * -1 * Recoil / 2.25);
+		}
+	}
+}
+
 
 void CC_Weapon::CoolDown()
 {
@@ -84,9 +121,9 @@ CC_Pistol::CC_Pistol(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoT
 	ScatterForce = 2.5;
 	Scatter = 0;
 	Recoil = 8;
-	ReloadTime = 20;
+	ReloadTime = 15;
 	ReloadProgress = 0;
-	isAutomatic = 1;
+	isAutomatic = 0;
 	ShotDone = 0;
 }
 
@@ -106,6 +143,22 @@ CC_AssaultRifle::CC_AssaultRifle(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<A
 	ShotDone = 0;
 }
 
+CC_Shotgun::CC_Shotgun(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType) : CC_Weapon(thisWeaponOwner, AmmoType)
+{
+	MaxScatter = 10;
+	ScatterForce = 10;
+	Scatter = 0;
+	Recoil = 15;
+	ReloadTime = 40;
+	ReloadProgress = 0;
+	isAutomatic = 0;
+	ShotDone = 0;
+}
+
 CC_AssaultRifle::~CC_AssaultRifle()
+{
+}
+
+CC_Shotgun::~CC_Shotgun()
 {
 }

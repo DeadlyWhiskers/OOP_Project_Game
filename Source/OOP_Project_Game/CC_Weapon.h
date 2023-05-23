@@ -21,7 +21,7 @@ protected:
 	ACC_PlayerClass* WeaponOwner;
 	UPaperFlipbookComponent* Sprite,* ShootFlash;
 	UCameraComponent* Camera;
-	FVector CameraLocation;
+	FVector* CameraLocation;
 
 public:
 	CC_Weapon();
@@ -45,4 +45,12 @@ class CC_AssaultRifle : public CC_Weapon
 public:
 	CC_AssaultRifle(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType);
 	~CC_AssaultRifle();
+};
+
+class CC_Shotgun : public CC_Weapon
+{
+public:
+	void Shoot(FVector MouseLocation) override;
+	CC_Shotgun(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType);
+	~CC_Shotgun();
 };

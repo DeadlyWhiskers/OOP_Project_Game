@@ -15,6 +15,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "PaperFlipbookComponent.h"
+#include <deque>
 #include "CC_Weapon.h"
 
 #include "CC_PlayerClass.generated.h"
@@ -34,12 +35,21 @@ protected:
 	APlayerController* PC;
 	FVector CameraLocation;
 
-	CC_Weapon* CurrentWeapon, * AssaultRifle, * Pistol, *Shotgun;
-
+	CC_Weapon * AssaultRifle, * Pistol, *Shotgun;
+	std::deque<CC_Weapon*> Weapons;
+	std::deque<CC_Weapon*>::iterator CurrentWeapon;
+	
 	//Move to weapon class
 	double MaxScatter = 7.5, ScatterForce = 2.5, Scatter = 0;
 	int Recoil = 8, ReloadTime = 20, ReloadProgress = 0;
 	bool isAutomatic = 1, ShotDone = 0;
+
+	UPROPERTY(EditAnywhere, Category = Ammo)
+		TSubclassOf<AActor> PistolAmmo;
+	UPROPERTY(EditAnywhere, Category = Ammo)
+		TSubclassOf<AActor> AssaultAmmo;
+	UPROPERTY(EditAnywhere, Category = Ammo)
+		TSubclassOf<AActor> ShotgunAmmo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector MouseLocation;
@@ -75,6 +85,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 		class UInputAction* ShootAction;
 	UPROPERTY(EditAnywhere, Category = Input)
+		class UInputAction* SwitchWeaponAction;
+	UPROPERTY(EditAnywhere, Category = Input)
 		class UInputAction* RotateAction;
 	UPROPERTY(EditAnywhere, Category = Input)
 		class UFloatingPawnMovement* Movement;
@@ -84,8 +96,6 @@ protected:
 		float MoveSpeed;
 	UPROPERTY(EditAnywhere, Category = Input)
 		float RotationSpeed;
-	UPROPERTY(EditAnywhere, Category = Ammo)
-		TSubclassOf<AActor> Ammo;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		//Temp test
 		FVector MousePos;
@@ -117,6 +127,7 @@ protected:
 	void Shoot(const FInputActionValue& Value);
 	void ShootEnd(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
+	void SwitchWeapon(const FInputActionValue& Value);
 	void Rotate(const FInputActionValue& Value);
 	//End of action functions.....................................
 
@@ -130,6 +141,7 @@ public:
 	UPaperFlipbookComponent* getShootFlash();
 	UCameraComponent* getCamera();
 	FVector* getCameraLocation();
+	APlayerController* getPC();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

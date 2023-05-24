@@ -76,10 +76,13 @@ void ACC_PlayerClass::BeginPlay()
 	Camera->SetWorldLocation(CameraLocation);
 
 	//Weapon setting up
-	Pistol = new CC_Pistol(this, Ammo);
-	AssaultRifle = new CC_AssaultRifle(this, Ammo);
-	Shotgun = new CC_Shotgun(this, Ammo);
-	CurrentWeapon = Shotgun;
+	Pistol = new CC_Pistol(this, PistolAmmo);
+	AssaultRifle = new CC_AssaultRifle(this, AssaultAmmo);
+	Shotgun = new CC_Shotgun(this, ShotgunAmmo);
+	Weapons.push_back(Pistol);
+	Weapons.push_back(AssaultRifle);
+	Weapons.push_back(Shotgun);
+	CurrentWeapon = Weapons.begin();
 }
 
 
@@ -89,12 +92,12 @@ void ACC_PlayerClass::Shoot(const FInputActionValue& Value)
 	PC->GetHitResultUnderCursorForObjects(ObjTraceChannel, true, HitResult);
 	MouseLocation.X = HitResult.Location.X;
 	MouseLocation.Y = HitResult.Location.Y;
-	CurrentWeapon->Shoot(MouseLocation);
+	(*CurrentWeapon)->Shoot(MouseLocation);
 }
 
 void ACC_PlayerClass::ShootEnd(const FInputActionValue& Value)
 {
-	CurrentWeapon->ShootEnd();
+	(*CurrentWeapon)->ShootEnd();
 }
 
 //Moving player
@@ -124,6 +127,21 @@ void ACC_PlayerClass::Move(const FInputActionValue& Value)
 	{
 		Sprite->SetFlipbook(MoveRight);
 		return;
+	}
+}
+
+void ACC_PlayerClass::SwitchWeapon(const FInputActionValue& Value)
+{
+	float SwitchDirection = Value.Get<float>();
+	if (SwitchDirection>0)
+	{
+		CurrentWeapon++;
+		if (CurrentWeapon == Weapons.end()) CurrentWeapon = Weapons.begin();
+	}
+	else
+	{
+		if (CurrentWeapon == Weapons.begin()) CurrentWeapon = Weapons.end() - 1;
+		CurrentWeapon--;
 	}
 }
 
@@ -167,10 +185,10 @@ void ACC_PlayerClass::Tick(float DeltaTime)
 	}
 	
 	//Reload
-	CurrentWeapon->Reload();
+	(*CurrentWeapon)->Reload();
 
 	//Scatter decrease
-	CurrentWeapon->CoolDown();
+	(*CurrentWeapon)->CoolDown();
 }
 
 UPaperFlipbookComponent* ACC_PlayerClass::getSprite()
@@ -193,6 +211,11 @@ FVector* ACC_PlayerClass::getCameraLocation()
 	return &CameraLocation;
 }
 
+APlayerController* ACC_PlayerClass::getPC()
+{
+	return PC;
+}
+
 // Called to bind functionality to input
 void ACC_PlayerClass::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -203,6 +226,7 @@ void ACC_PlayerClass::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	NewInput->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ACC_PlayerClass::Rotate);
 	NewInput->BindAction(MoveAction, ETriggerEvent::Completed, this, &ACC_PlayerClass::UnsetSprite);
 	NewInput->BindAction(ShootAction, ETriggerEvent::Completed, this, &ACC_PlayerClass::ShootEnd);
+	NewInput->BindAction(SwitchWeaponAction, ETriggerEvent::Triggered, this, &ACC_PlayerClass::SwitchWeapon);
 
 }
 

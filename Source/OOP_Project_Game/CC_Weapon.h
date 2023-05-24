@@ -22,6 +22,7 @@ protected:
 	UPaperFlipbookComponent* Sprite,* ShootFlash;
 	UCameraComponent* Camera;
 	FVector* CameraLocation;
+	APlayerController* PC;
 
 public:
 	CC_Weapon();

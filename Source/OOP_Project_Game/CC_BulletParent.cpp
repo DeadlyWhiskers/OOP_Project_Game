@@ -22,6 +22,17 @@ void ACC_BulletParent::BeginPlay()
 void ACC_BulletParent::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	Lifespan--;
+	if (Lifespan < 0) Destroy();
+}
 
+int ACC_BulletParent::getDamage()
+{
+	return Damage;
+}
+
+bool ACC_BulletParent::isEnemy()
+{
+	return Enemy;
 }
 

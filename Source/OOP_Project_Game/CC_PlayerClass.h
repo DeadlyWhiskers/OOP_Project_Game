@@ -15,6 +15,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "PaperFlipbookComponent.h"
+#include <deque>
+#include "CC_Weapon.h"
 
 #include "CC_PlayerClass.generated.h"
 
@@ -33,17 +35,16 @@ protected:
 	APlayerController* PC;
 	FVector CameraLocation;
 
-	//Move to weapon class
-	double MaxScatter = 7.5, ScatterForce = 2.5, Scatter = 0;
-	int Recoil = 8, ReloadTime = 20, ReloadProgress = 0;
-	bool isAutomatic = 1, ShotDone = 0;
+	CC_Weapon * AssaultRifle, * Pistol, *Shotgun;
+	std::deque<CC_Weapon*> Weapons;
+	std::deque<CC_Weapon*>::iterator CurrentWeapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FVector MouseLocation;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int CurrentHealth;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int MaxHealth;
+	UPROPERTY(EditAnywhere, Category = Ammo)
+		TSubclassOf<AActor> PistolAmmo;
+	UPROPERTY(EditAnywhere, Category = Ammo)
+		TSubclassOf<AActor> AssaultAmmo;
+	UPROPERTY(EditAnywhere, Category = Ammo)
+		TSubclassOf<AActor> ShotgunAmmo;
 	UPROPERTY(EditAnywhere, Category = Enemy)
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjTraceChannel;
 
@@ -72,6 +73,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 		class UInputAction* ShootAction;
 	UPROPERTY(EditAnywhere, Category = Input)
+		class UInputAction* SwitchWeaponAction;
+	UPROPERTY(EditAnywhere, Category = Input)
 		class UInputAction* RotateAction;
 	UPROPERTY(EditAnywhere, Category = Input)
 		class UFloatingPawnMovement* Movement;
@@ -81,8 +84,6 @@ protected:
 		float MoveSpeed;
 	UPROPERTY(EditAnywhere, Category = Input)
 		float RotationSpeed;
-	UPROPERTY(EditAnywhere, Category = Ammo)
-		TSubclassOf<AActor> Ammo;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		//Temp test
 		FVector MousePos;
@@ -114,7 +115,9 @@ protected:
 	void Shoot(const FInputActionValue& Value);
 	void ShootEnd(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
+	void SwitchWeapon(const FInputActionValue& Value);
 	void Rotate(const FInputActionValue& Value);
+
 	//End of action functions.....................................
 
 	void UnsetSprite(const FInputActionValue& Value);
@@ -122,6 +125,31 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPaperFlipbookComponent* getSprite();
+	UPaperFlipbookComponent* getShootFlash();
+	UCameraComponent* getCamera();
+	FVector* getCameraLocation();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnWeaponSwitch();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void UpdateHP();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void UpdateReloadProgress();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FVector MouseLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int CurrentHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int CurrentWeaponReload;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int CurrentWeaponId;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int MaxHealth;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

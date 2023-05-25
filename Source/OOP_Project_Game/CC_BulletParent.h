@@ -19,8 +19,19 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere)
+		int Damage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int Speed;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int Lifespan;
+	UPROPERTY(EditAnywhere)
+		bool Enemy;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	int getDamage();
+	bool isEnemy();
 };

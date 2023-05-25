@@ -15,14 +15,13 @@ class OOP_PROJECT_GAME_API CC_Weapon
 {
 protected:
 	double MaxScatter, MinScatter, ScatterForce, Scatter;
-	int Recoil, ReloadTime, ReloadProgress;
+	int Recoil, ReloadTime, ReloadProgress, WeaponId;
 	bool isAutomatic, ShotDone;
 	TSubclassOf<AActor> Ammo;
 	ACC_PlayerClass* WeaponOwner;
 	UPaperFlipbookComponent* Sprite,* ShootFlash;
 	UCameraComponent* Camera;
 	FVector* CameraLocation;
-	APlayerController* PC;
 
 public:
 	CC_Weapon();
@@ -32,6 +31,8 @@ public:
 	void Reload();
 	void ShootEnd();
 	virtual ~CC_Weapon();
+	int getWeaponID();
+	int getReloadProgress();
 };
 
 class CC_Pistol : public CC_Weapon

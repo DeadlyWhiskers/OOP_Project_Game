@@ -83,6 +83,10 @@ void ACC_PlayerClass::BeginPlay()
 	Weapons.push_back(AssaultRifle);
 	Weapons.push_back(Shotgun);
 	CurrentWeapon = Weapons.begin();
+	UpdateHP();
+	OnWeaponSwitch();
+
+	PC->CurrentMouseCursor = EMouseCursor::Crosshairs;
 }
 
 
@@ -141,8 +145,10 @@ void ACC_PlayerClass::SwitchWeapon(const FInputActionValue& Value)
 	else
 	{
 		if (CurrentWeapon == Weapons.begin()) CurrentWeapon = Weapons.end() - 1;
-		CurrentWeapon--;
+		else CurrentWeapon--;
 	}
+	CurrentWeaponId = (*CurrentWeapon)->getWeaponID();
+	OnWeaponSwitch();
 }
 
 
@@ -186,6 +192,8 @@ void ACC_PlayerClass::Tick(float DeltaTime)
 	
 	//Reload
 	(*CurrentWeapon)->Reload();
+	CurrentWeaponReload = (*CurrentWeapon)->getReloadProgress();
+	UpdateReloadProgress();
 
 	//Scatter decrease
 	(*CurrentWeapon)->CoolDown();
@@ -209,11 +217,6 @@ UCameraComponent* ACC_PlayerClass::getCamera()
 FVector* ACC_PlayerClass::getCameraLocation()
 {
 	return &CameraLocation;
-}
-
-APlayerController* ACC_PlayerClass::getPC()
-{
-	return PC;
 }
 
 // Called to bind functionality to input

@@ -126,6 +126,11 @@ int CC_Weapon::getReloadProgress()
 	return ReloadProgress;
 }
 
+int CC_Weapon::getReloadTime()
+{
+	return ReloadTime;
+}
+
 CC_Pistol::CC_Pistol(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType) : CC_Weapon(thisWeaponOwner, AmmoType)
 {
 	WeaponId = 1;

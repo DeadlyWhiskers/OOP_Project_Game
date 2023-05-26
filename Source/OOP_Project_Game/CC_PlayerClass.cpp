@@ -83,6 +83,8 @@ void ACC_PlayerClass::BeginPlay()
 	Weapons.push_back(AssaultRifle);
 	Weapons.push_back(Shotgun);
 	CurrentWeapon = Weapons.begin();
+	CurrentWeaponId = (*CurrentWeapon)->getWeaponID();
+	CurrentWeaponReloadTime = (*CurrentWeapon)->getReloadTime();
 	UpdateHP();
 	OnWeaponSwitch();
 
@@ -96,6 +98,7 @@ void ACC_PlayerClass::Shoot(const FInputActionValue& Value)
 	PC->GetHitResultUnderCursorForObjects(ObjTraceChannel, true, HitResult);
 	MouseLocation.X = HitResult.Location.X;
 	MouseLocation.Y = HitResult.Location.Y;
+	OnShoot();
 	(*CurrentWeapon)->Shoot(MouseLocation);
 }
 
@@ -148,6 +151,8 @@ void ACC_PlayerClass::SwitchWeapon(const FInputActionValue& Value)
 		else CurrentWeapon--;
 	}
 	CurrentWeaponId = (*CurrentWeapon)->getWeaponID();
+	SwitchPlayerModel(CurrentWeaponId);
+	CurrentWeaponReloadTime = (*CurrentWeapon)->getReloadTime();
 	OnWeaponSwitch();
 }
 
@@ -194,7 +199,7 @@ void ACC_PlayerClass::Tick(float DeltaTime)
 	(*CurrentWeapon)->Reload();
 	CurrentWeaponReload = (*CurrentWeapon)->getReloadProgress();
 	UpdateReloadProgress();
-
+	SwitchPlayerModel(CurrentWeaponId);
 	//Scatter decrease
 	(*CurrentWeapon)->CoolDown();
 }
@@ -231,6 +236,41 @@ void ACC_PlayerClass::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	NewInput->BindAction(ShootAction, ETriggerEvent::Completed, this, &ACC_PlayerClass::ShootEnd);
 	NewInput->BindAction(SwitchWeaponAction, ETriggerEvent::Triggered, this, &ACC_PlayerClass::SwitchWeapon);
 
+}
+
+void ACC_PlayerClass::SwitchPlayerModel(int NewWeapon)
+{
+	switch (NewWeapon)
+	{
+	case(1):
+	{
+		MoveUp = MoveUpPistol;
+		MoveDown = MoveDownPistol;
+		MoveLeft = MoveLeftPistol;
+		MoveRight = MoveRightPistol;
+		break;
+	}
+	case(2):
+	{
+		MoveUp = MoveUpAssaultRifle;
+		MoveDown = MoveDownAssaultRifle;
+		MoveLeft = MoveLeftAssaultRifle;
+		MoveRight = MoveRightAssaultRifle;
+		break;
+	}
+	case(3):
+	{
+		MoveUp = MoveUpShotgun;
+		MoveDown = MoveDownShotgun;
+		MoveLeft = MoveLeftShotgun;
+		MoveRight = MoveRightShotgun;
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
 }
 
 //Functions to set overlap and hit events(getting damange etc.)

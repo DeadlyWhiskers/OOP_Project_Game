@@ -34,6 +34,7 @@ protected:
 	virtual void BeginPlay() override;
 	APlayerController* PC;
 	FVector CameraLocation;
+	int MovingDirection;
 
 	CC_Weapon * AssaultRifle, * Pistol, *Shotgun;
 	std::deque<CC_Weapon*> Weapons;
@@ -45,8 +46,8 @@ protected:
 		TSubclassOf<AActor> AssaultAmmo;
 	UPROPERTY(EditAnywhere, Category = Ammo)
 		TSubclassOf<AActor> ShotgunAmmo;
-	UPROPERTY(EditAnywhere, Category = Enemy)
-		TArray<TEnumAsByte<EObjectTypeQuery>> ObjTraceChannel;
+	//UPROPERTY(EditAnywhere, Category = Enemy)
+		//TArray<TEnumAsByte<EObjectTypeQuery>> ObjTraceChannel;
 
 	//Structure.....................................
 	UPROPERTY(EditAnywhere)
@@ -137,7 +138,8 @@ protected:
 		void OnHitEnemy(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION()
 		void OnOverlapEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	FHitResult HitResult;
+	//FHitResult HitResult;
+	FVector HitResult, HitResultDir;
 	//End of overlaps.....................................
 
 	//ActionFunctions.....................................

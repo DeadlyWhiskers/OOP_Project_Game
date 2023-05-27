@@ -24,16 +24,16 @@ ACC_PlayerClass::ACC_PlayerClass()
 	Sprite = CreateAbstractDefaultSubobject<UPaperFlipbookComponent>("Sprite");
 	ShootFlash = CreateAbstractDefaultSubobject<UPaperFlipbookComponent>("Flash");
 
-	DummyRoot = CreateDefaultSubobject<USceneComponent>("Root");
-	SetRootComponent(DummyRoot);
+	//DummyRoot = CreateDefaultSubobject<USceneComponent>("Root");
+	SetRootComponent(Collider);
 	//SetRootComponent(Collider);
 
 	//Attaching objects to each other
 	//Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	//SpringArm->SetupAttachment(Collider);
-	Sprite->SetupAttachment(DummyRoot);
-	Collider->SetupAttachment(DummyRoot);
-	Camera->SetupAttachment(DummyRoot);
+	Sprite->SetupAttachment(Collider);
+	Collider->SetupAttachment(Collider);
+	Camera->SetupAttachment(Collider);
 	ShootFlash->SetupAttachment(Sprite, "Flash");
 
 	//Setting starting sprite
@@ -61,7 +61,7 @@ void ACC_PlayerClass::BeginPlay()
 	}
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
 	Subsystem->AddMappingContext(MapContext, 0);
-	ObjTraceChannel.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
+	//ObjTraceChannel.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
 	Collider->OnComponentHit.AddDynamic(this, &ACC_PlayerClass::OnHitEnemy);
 	Collider->OnComponentBeginOverlap.AddDynamic(this, &ACC_PlayerClass::OnOverlapEnemy);
 	MouseLocation.Z = GetActorLocation().Z;
@@ -83,9 +83,12 @@ void ACC_PlayerClass::BeginPlay()
 	Weapons.push_back(AssaultRifle);
 	Weapons.push_back(Shotgun);
 	CurrentWeapon = Weapons.begin();
+	CurrentWeaponId = (*CurrentWeapon)->getWeaponID();
+	CurrentWeaponReloadTime = (*CurrentWeapon)->getReloadTime();
 	UpdateHP();
 	OnWeaponSwitch();
-
+	SwitchPlayerModel(CurrentWeaponId);
+	MovingDirection = 0;
 	PC->CurrentMouseCursor = EMouseCursor::Crosshairs;
 }
 
@@ -93,9 +96,14 @@ void ACC_PlayerClass::BeginPlay()
 //Spawning bullet
 void ACC_PlayerClass::Shoot(const FInputActionValue& Value)
 {
-	PC->GetHitResultUnderCursorForObjects(ObjTraceChannel, true, HitResult);
-	MouseLocation.X = HitResult.Location.X;
-	MouseLocation.Y = HitResult.Location.Y;
+	//PC->GetHitResultUnderCursorForObjects(ObjTraceChannel, true, HitResult);
+	//PC->GetHitResultUnderCursor(ECC_Visibility, true, HitResult);
+	PC->DeprojectMousePositionToWorld(HitResult, HitResultDir);
+	/*MouseLocation.X = HitResult.Location.X;
+	MouseLocation.Y = HitResult.Location.Y;*/
+	MouseLocation.X = HitResult.X;
+	MouseLocation.Y = HitResult.Y;
+	OnShoot();
 	(*CurrentWeapon)->Shoot(MouseLocation);
 }
 
@@ -114,21 +122,25 @@ void ACC_PlayerClass::Move(const FInputActionValue& Value)
 	AddMovementInput(GetActorRotation().RotateVector(MovementDir), GetWorld()->GetDeltaSeconds() * MoveSpeed);
 	if (MovementDir.X > 0)
 	{
+		MovingDirection = 0;
 		Sprite->SetFlipbook(MoveUp);
 		return;
 	}
 	if (MovementDir.X < 0)
 	{
+		MovingDirection = 1;
 		Sprite->SetFlipbook(MoveDown);
 		return;
 	}
 	if (MovementDir.Y < 0)
 	{
+		MovingDirection = 2;
 		Sprite->SetFlipbook(MoveLeft);
 		return;
 	}
 	if (MovementDir.Y > 0)
 	{
+		MovingDirection = 3;
 		Sprite->SetFlipbook(MoveRight);
 		return;
 	}
@@ -148,6 +160,8 @@ void ACC_PlayerClass::SwitchWeapon(const FInputActionValue& Value)
 		else CurrentWeapon--;
 	}
 	CurrentWeaponId = (*CurrentWeapon)->getWeaponID();
+	SwitchPlayerModel(CurrentWeaponId);
+	CurrentWeaponReloadTime = (*CurrentWeapon)->getReloadTime();
 	OnWeaponSwitch();
 }
 
@@ -194,7 +208,6 @@ void ACC_PlayerClass::Tick(float DeltaTime)
 	(*CurrentWeapon)->Reload();
 	CurrentWeaponReload = (*CurrentWeapon)->getReloadProgress();
 	UpdateReloadProgress();
-
 	//Scatter decrease
 	(*CurrentWeapon)->CoolDown();
 }
@@ -231,6 +244,66 @@ void ACC_PlayerClass::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	NewInput->BindAction(ShootAction, ETriggerEvent::Completed, this, &ACC_PlayerClass::ShootEnd);
 	NewInput->BindAction(SwitchWeaponAction, ETriggerEvent::Triggered, this, &ACC_PlayerClass::SwitchWeapon);
 
+}
+
+void ACC_PlayerClass::SwitchPlayerModel(int NewWeapon)
+{
+	switch (NewWeapon)
+	{
+	case(1):
+	{
+		MoveUp = MoveUpPistol;
+		MoveDown = MoveDownPistol;
+		MoveLeft = MoveLeftPistol;
+		MoveRight = MoveRightPistol;
+		break;
+	}
+	case(2):
+	{
+		MoveUp = MoveUpAssaultRifle;
+		MoveDown = MoveDownAssaultRifle;
+		MoveLeft = MoveLeftAssaultRifle;
+		MoveRight = MoveRightAssaultRifle;
+		break;
+	}
+	case(3):
+	{
+		MoveUp = MoveUpShotgun;
+		MoveDown = MoveDownShotgun;
+		MoveLeft = MoveLeftShotgun;
+		MoveRight = MoveRightShotgun;
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
+	switch (MovingDirection)
+	{
+	case(0):
+	{
+		Sprite->SetFlipbook(MoveUp);
+		break;
+	}
+	case(1):
+	{
+		Sprite->SetFlipbook(MoveDown);
+		break;
+	}
+	case(2):
+	{
+		Sprite->SetFlipbook(MoveLeft);
+		break;
+	}
+	case(3):
+	{
+		Sprite->SetFlipbook(MoveRight);
+		break;
+	}
+	default: break;
+	}
+	Sprite->SetPlaybackPositionInFrames(2, false);
 }
 
 //Functions to set overlap and hit events(getting damange etc.)

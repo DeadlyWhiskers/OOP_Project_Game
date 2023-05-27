@@ -33,6 +33,7 @@ public:
 	virtual ~CC_Weapon();
 	int getWeaponID();
 	int getReloadProgress();
+	int getReloadTime();
 };
 
 class CC_Pistol : public CC_Weapon

@@ -34,6 +34,7 @@ protected:
 	virtual void BeginPlay() override;
 	APlayerController* PC;
 	FVector CameraLocation;
+	int MovingDirection;
 
 	CC_Weapon * AssaultRifle, * Pistol, *Shotgun;
 	std::deque<CC_Weapon*> Weapons;
@@ -45,8 +46,8 @@ protected:
 		TSubclassOf<AActor> AssaultAmmo;
 	UPROPERTY(EditAnywhere, Category = Ammo)
 		TSubclassOf<AActor> ShotgunAmmo;
-	UPROPERTY(EditAnywhere, Category = Enemy)
-		TArray<TEnumAsByte<EObjectTypeQuery>> ObjTraceChannel;
+	//UPROPERTY(EditAnywhere, Category = Enemy)
+		//TArray<TEnumAsByte<EObjectTypeQuery>> ObjTraceChannel;
 
 	//Structure.....................................
 	UPROPERTY(EditAnywhere)
@@ -101,6 +102,35 @@ protected:
 		UPaperFlipbook* MoveLeft;
 	UPROPERTY(EditAnywhere, Category = "Sprites")
 		UPaperFlipbook* MoveRight;
+
+
+	//Pistol.............................
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* MoveUpPistol;
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* MoveDownPistol;
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* MoveLeftPistol;
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* MoveRightPistol;
+	//AssaultRifle...........................
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* MoveUpAssaultRifle;
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* MoveDownAssaultRifle;
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* MoveLeftAssaultRifle;
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* MoveRightAssaultRifle;
+	//Shotgun...................................
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* MoveUpShotgun;
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* MoveDownShotgun;
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* MoveLeftShotgun;
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* MoveRightShotgun;
 	//End Of sprites.....................................
 
 	//Overlaps.....................................
@@ -108,7 +138,8 @@ protected:
 		void OnHitEnemy(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION()
 		void OnOverlapEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	FHitResult HitResult;
+	//FHitResult HitResult;
+	FVector HitResult, HitResultDir;
 	//End of overlaps.....................................
 
 	//ActionFunctions.....................................
@@ -117,6 +148,7 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void SwitchWeapon(const FInputActionValue& Value);
 	void Rotate(const FInputActionValue& Value);
+	void SwitchPlayerModel(int NewWeapon);
 
 	//End of action functions.....................................
 
@@ -135,6 +167,9 @@ public:
 		void OnWeaponSwitch();
 
 	UFUNCTION(BlueprintImplementableEvent)
+		void OnShoot();
+
+	UFUNCTION(BlueprintImplementableEvent)
 		void UpdateHP();
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -146,6 +181,8 @@ public:
 		int CurrentHealth;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int CurrentWeaponReload;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int CurrentWeaponReloadTime;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int CurrentWeaponId;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

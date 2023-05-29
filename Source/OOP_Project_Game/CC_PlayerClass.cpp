@@ -118,8 +118,8 @@ void ACC_PlayerClass::Move(const FInputActionValue& Value)
 	const FVector MovementDir = Value.Get<FVector>();
 
 	Sprite->Play();
-
-	AddMovementInput(GetActorRotation().RotateVector(MovementDir), GetWorld()->GetDeltaSeconds() * MoveSpeed);
+	float DeltaTime = this->GetWorld()->GetDeltaSeconds();
+	AddMovementInput(GetActorRotation().RotateVector(MovementDir), GetWorld()->GetDeltaSeconds() * MoveSpeed*DeltaTime);
 	if (MovementDir.X > 0)
 	{
 		MovingDirection = 0;

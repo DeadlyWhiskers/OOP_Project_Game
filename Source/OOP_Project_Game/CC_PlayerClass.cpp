@@ -1,8 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "CC_PickableItem.h"
-
 #include "CC_PlayerClass.h"
+
+#include "CC_PickableItem.h"
 
 //to create simmilar classes
 //#include "BulletDef.h"

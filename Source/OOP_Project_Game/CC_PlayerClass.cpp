@@ -1,5 +1,6 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
+#include "CC_PickableItem.h"
 
 #include "CC_PlayerClass.h"
 
@@ -115,10 +116,15 @@ void ACC_PlayerClass::ShootEnd(const FInputActionValue& Value)
 //Moving player
 void ACC_PlayerClass::Move(const FInputActionValue& Value)
 {
-	const FVector MovementDir = Value.Get<FVector>();
+	FVector MovementDir = Value.Get<FVector>();
 
 	Sprite->Play();
 	float DeltaTime = this->GetWorld()->GetDeltaSeconds();
+	if (MovementDir.X != 0 && MovementDir.Y != 0)
+	{
+		MovementDir.X *= 0.7;
+		MovementDir.Y *= 0.7;
+	}
 	AddMovementInput(GetActorRotation().RotateVector(MovementDir), GetWorld()->GetDeltaSeconds() * MoveSpeed*DeltaTime);
 	if (MovementDir.X > 0)
 	{
@@ -330,6 +336,48 @@ void ACC_PlayerClass::OnOverlapEnemy(UPrimitiveComponent* OverlappedComponent, A
 		health--;
 		if (!health) Destroy();
 	}*/
+
+	ACC_PickableItem* Temp = Cast<ACC_PickableItem>(OtherActor);
+	if (Temp)
+	{
+		switch(Temp->getId())
+		{
+		case(0):
+			if (CurrentHealth < MaxHealth)
+			{
+				CurrentHealth = CurrentHealth+Temp->getAmount();
+				UpdateHP();
+			}
+			Temp->Destroy();
+			break;
+		case(1):
+			/*
+			Add Ammo
+			if (CurrentHealth < MaxHealth)
+			{
+				CurrentHealth = CurrentHealth + Temp->getAmount();
+			}
+			Temp->Destroy();*/
+			break;
+		case(2):
+			if (MaxHealth < 5)
+			{
+				MaxHealth = MaxHealth + Temp->getAmount();
+				UpdateHP();
+			}
+			Temp->Destroy();
+			break;
+		case(3):
+			CurrentHealth = CurrentHealth - Temp->getAmount();
+				UpdateHP();
+			Temp->Destroy();
+			break;
+		}
+		if (CurrentHealth <= 0)
+		{
+			Destroy();
+		}
+	}
 
 	//Самый жёсткий в мире костыль, но такой рабочий и удобный))
 	/*if (OtherActor->GetClass()->GetName() == "target_C")

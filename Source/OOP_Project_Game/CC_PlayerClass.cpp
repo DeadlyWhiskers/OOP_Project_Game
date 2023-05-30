@@ -92,6 +92,7 @@ void ACC_PlayerClass::BeginPlay()
 	SwitchPlayerModel(CurrentWeaponId);
 	MovingDirection = 0;
 	PC->CurrentMouseCursor = EMouseCursor::Crosshairs;
+	isDead = false;
 }
 
 
@@ -194,7 +195,8 @@ void ACC_PlayerClass::UnsetSprite(const FInputActionValue& Value)
 void ACC_PlayerClass::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (!isDead)
+	{
 	//Temporary camera movement system
 	FVector DistanceVector = CameraLocation - this->GetActorLocation();
 	DistanceVector.Z = 0;
@@ -214,11 +216,20 @@ void ACC_PlayerClass::Tick(float DeltaTime)
 	}
 	
 	//Reload
-	(*CurrentWeapon)->Reload();
-	CurrentWeaponReload = (*CurrentWeapon)->getReloadProgress();
-	UpdateReloadProgress();
-	//Scatter decrease
-	(*CurrentWeapon)->CoolDown();
+	
+		(*CurrentWeapon)->Reload();
+		CurrentWeaponReload = (*CurrentWeapon)->getReloadProgress();
+		UpdateReloadProgress();
+		//Scatter decrease
+		(*CurrentWeapon)->CoolDown();
+	}
+	else
+	{
+		if (Sprite->GetPlaybackPositionInFrames() == Sprite->GetFlipbookLengthInFrames()-1)
+		{
+			Destroy();
+		}
+	}
 }
 
 UPaperFlipbookComponent* ACC_PlayerClass::getSprite()
@@ -317,15 +328,21 @@ void ACC_PlayerClass::SwitchPlayerModel(int NewWeapon)
 
 void ACC_PlayerClass::Die()
 {
+	isDead = true;
+	OnDeath();
 	while (Weapons.size() != 0)
 	{
-		delete Weapons.back();
 		Weapons.pop_back();
 	}
+	Weapons.~deque();
+	delete Pistol;
+	delete AssaultRifle;
+	delete Shotgun;
+	DisableInput(PC);
 	Sprite->SetFlipbook(Death);
-	while (Sprite->GetPlaybackPositionInFrames() != Sprite->GetFlipbookLengthInFrames());
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, 3, false);
-	Destroy();
+	Sprite->SetLooping(false);
+	Sprite->Play();
+	//Destroy();
 }
 
 //Functions to set overlap and hit events(getting damange etc.)

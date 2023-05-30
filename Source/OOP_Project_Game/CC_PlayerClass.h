@@ -32,10 +32,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	FTimerHandle TimerHandle;
 	APlayerController* PC;
 	FVector CameraLocation;
 	int MovingDirection;
+	bool isDead;
 
 	CC_Weapon * AssaultRifle, * Pistol, *Shotgun;
 	std::deque<CC_Weapon*> Weapons;

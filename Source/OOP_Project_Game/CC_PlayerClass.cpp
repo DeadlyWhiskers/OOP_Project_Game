@@ -77,15 +77,16 @@ void ACC_PlayerClass::BeginPlay()
 	Camera->SetWorldLocation(CameraLocation);
 
 	//Weapon setting up
-	Pistol = new CC_Pistol(this, PistolAmmo);
-	AssaultRifle = new CC_AssaultRifle(this, AssaultAmmo);
-	Shotgun = new CC_Shotgun(this, ShotgunAmmo);
+	Pistol = new CC_Pistol(this, PistolAmmo, 30);
+	AssaultRifle = new CC_AssaultRifle(this, AssaultAmmo, 90);
+	Shotgun = new CC_Shotgun(this, ShotgunAmmo, 15);
 	Weapons.push_back(Pistol);
 	Weapons.push_back(AssaultRifle);
 	Weapons.push_back(Shotgun);
 	CurrentWeapon = Weapons.begin();
 	CurrentWeaponId = (*CurrentWeapon)->getWeaponID();
 	CurrentWeaponReloadTime = (*CurrentWeapon)->getReloadTime();
+	CurrentBullets = ((*CurrentWeapon)->GetBullets());
 	UpdateHP();
 	OnWeaponSwitch();
 	SwitchPlayerModel(CurrentWeaponId);
@@ -104,8 +105,9 @@ void ACC_PlayerClass::Shoot(const FInputActionValue& Value)
 	MouseLocation.Y = HitResult.Location.Y;*/
 	MouseLocation.X = HitResult.X;
 	MouseLocation.Y = HitResult.Y;
-	OnShoot();
 	(*CurrentWeapon)->Shoot(MouseLocation);
+	CurrentBullets = ((*CurrentWeapon)->GetBullets());
+	OnShoot();
 }
 
 void ACC_PlayerClass::ShootEnd(const FInputActionValue& Value)
@@ -168,6 +170,7 @@ void ACC_PlayerClass::SwitchWeapon(const FInputActionValue& Value)
 	CurrentWeaponId = (*CurrentWeapon)->getWeaponID();
 	SwitchPlayerModel(CurrentWeaponId);
 	CurrentWeaponReloadTime = (*CurrentWeapon)->getReloadTime();
+	CurrentBullets = ((*CurrentWeapon)->GetBullets());
 	OnWeaponSwitch();
 }
 
@@ -312,6 +315,19 @@ void ACC_PlayerClass::SwitchPlayerModel(int NewWeapon)
 	Sprite->SetPlaybackPositionInFrames(2, false);
 }
 
+void ACC_PlayerClass::Die()
+{
+	while (Weapons.size() != 0)
+	{
+		delete Weapons.back();
+		Weapons.pop_back();
+	}
+	Sprite->SetFlipbook(Death);
+	while (Sprite->GetPlaybackPositionInFrames() != Sprite->GetFlipbookLengthInFrames());
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, 3, false);
+	Destroy();
+}
+
 //Functions to set overlap and hit events(getting damange etc.)
 
 void ACC_PlayerClass::OnHitEnemy(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -351,13 +367,10 @@ void ACC_PlayerClass::OnOverlapEnemy(UPrimitiveComponent* OverlappedComponent, A
 			Temp->Destroy();
 			break;
 		case(1):
-			/*
-			Add Ammo
-			if (CurrentHealth < MaxHealth)
-			{
-				CurrentHealth = CurrentHealth + Temp->getAmount();
-			}
-			Temp->Destroy();*/
+			(*CurrentWeapon)->AddBullets(Temp->getAmount());
+			CurrentBullets = ((*CurrentWeapon)->GetBullets());
+				OnShoot();
+			Temp->Destroy();
 			break;
 		case(2):
 			if (MaxHealth < 5)
@@ -375,7 +388,7 @@ void ACC_PlayerClass::OnOverlapEnemy(UPrimitiveComponent* OverlappedComponent, A
 		}
 		if (CurrentHealth <= 0)
 		{
-			Destroy();
+			Die();
 		}
 	}
 

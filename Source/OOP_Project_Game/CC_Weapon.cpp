@@ -17,6 +17,7 @@ CC_Weapon::CC_Weapon(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoT
 	ShootFlash = WeaponOwner->getShootFlash();
 	CameraLocation = WeaponOwner->getCameraLocation();
 	MinScatter = 0;
+	Bullets = 0;
 }
 
 CC_Weapon::~CC_Weapon()
@@ -25,9 +26,10 @@ CC_Weapon::~CC_Weapon()
 
 void CC_Weapon::Shoot(FVector MouseLocation)
 {
-	if (ShotDone == 0 && ReloadProgress == 0)
+	if (ShotDone == 0 && ReloadProgress == 0 && Bullets != 0)
 	{
 		if (!isAutomatic) ShotDone = 1;
+		Bullets--;
 		ReloadProgress = ReloadTime;
 		FVector MuzzleLocation = Sprite->GetSocketLocation("Flash");
 		MuzzleLocation.Z = WeaponOwner->GetActorLocation().Z;
@@ -62,9 +64,10 @@ void CC_Weapon::Shoot(FVector MouseLocation)
 
 void CC_Shotgun::Shoot(FVector MouseLocation)
 {
-	if (ShotDone == 0 && ReloadProgress == 0)
+	if (ShotDone == 0 && ReloadProgress == 0 && Bullets != 0)
 	{
 		if (!isAutomatic) ShotDone = 1;
+		Bullets--;
 		ReloadProgress = ReloadTime;
 		FVector MuzzleLocation = Sprite->GetSocketLocation("Flash");
 		MuzzleLocation.Z = WeaponOwner->GetActorLocation().Z;
@@ -116,6 +119,21 @@ void CC_Weapon::Reload()
 	}
 }
 
+void CC_Weapon::AddBullets(int AdditionalBullets)
+{
+	Bullets += AdditionalBullets;
+}
+
+void CC_AssaultRifle::AddBullets(int AdditionalBullets)
+{
+	Bullets += AdditionalBullets*3;
+}
+
+void CC_Shotgun::AddBullets(int AdditionalBullets)
+{
+	Bullets += AdditionalBullets/2;
+}
+
 int CC_Weapon::getWeaponID()
 {
 	return WeaponId;
@@ -131,7 +149,12 @@ int CC_Weapon::getReloadTime()
 	return ReloadTime;
 }
 
-CC_Pistol::CC_Pistol(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType) : CC_Weapon(thisWeaponOwner, AmmoType)
+int CC_Weapon::GetBullets()
+{
+	return Bullets;
+}
+
+CC_Pistol::CC_Pistol(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType, int StartingBullets) : CC_Weapon(thisWeaponOwner, AmmoType)
 {
 	WeaponId = 1;
 	MaxScatter = 7.5;
@@ -142,13 +165,14 @@ CC_Pistol::CC_Pistol(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoT
 	ReloadProgress = 0;
 	isAutomatic = 0;
 	ShotDone = 0;
+	Bullets = StartingBullets;
 }
 
 CC_Pistol::~CC_Pistol()
 {
 }
 
-CC_AssaultRifle::CC_AssaultRifle(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType) : CC_Weapon(thisWeaponOwner, AmmoType)
+CC_AssaultRifle::CC_AssaultRifle(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType, int StartingBullets) : CC_Weapon(thisWeaponOwner, AmmoType)
 {
 	WeaponId = 2;
 	MaxScatter = 7.5;
@@ -159,9 +183,10 @@ CC_AssaultRifle::CC_AssaultRifle(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<A
 	ReloadProgress = 0;
 	isAutomatic = 1;
 	ShotDone = 0;
+	Bullets = StartingBullets;
 }
 
-CC_Shotgun::CC_Shotgun(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType) : CC_Weapon(thisWeaponOwner, AmmoType)
+CC_Shotgun::CC_Shotgun(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> AmmoType, int StartingBullets) : CC_Weapon(thisWeaponOwner, AmmoType)
 {
 	WeaponId = 3;
 	MinScatter = 2;
@@ -174,6 +199,7 @@ CC_Shotgun::CC_Shotgun(ACC_PlayerClass* thisWeaponOwner, TSubclassOf<AActor> Amm
 	ReloadProgress = 0;
 	isAutomatic = 0;
 	ShotDone = 0;
+	Bullets = StartingBullets;
 }
 
 CC_AssaultRifle::~CC_AssaultRifle()

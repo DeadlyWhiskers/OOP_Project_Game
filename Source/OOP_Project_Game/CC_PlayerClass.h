@@ -32,6 +32,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	FTimerHandle TimerHandle;
 	APlayerController* PC;
 	FVector CameraLocation;
 	int MovingDirection;
@@ -62,8 +63,6 @@ protected:
 		class UPaperFlipbookComponent* Sprite;
 	UPROPERTY(EditAnywhere)
 		class UPaperFlipbookComponent* ShootFlash;
-	UPROPERTY(EditAnywhere)
-		class USceneComponent *DummyRoot;
 	//End of structure.....................................
 	
 	//Input.....................................
@@ -102,6 +101,8 @@ protected:
 		UPaperFlipbook* MoveLeft;
 	UPROPERTY(EditAnywhere, Category = "Sprites")
 		UPaperFlipbook* MoveRight;
+	UPROPERTY(EditAnywhere, Category = "Sprites")
+		UPaperFlipbook* Death;
 
 
 	//Pistol.............................
@@ -149,6 +150,7 @@ protected:
 	void SwitchWeapon(const FInputActionValue& Value);
 	void Rotate(const FInputActionValue& Value);
 	void SwitchPlayerModel(int NewWeapon);
+	void Die();
 
 	//End of action functions.....................................
 
@@ -175,6 +177,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void UpdateReloadProgress();
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnDeath();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector MouseLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -185,6 +190,8 @@ public:
 		int CurrentWeaponReloadTime;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int CurrentWeaponId;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int CurrentBullets;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int MaxHealth;
 

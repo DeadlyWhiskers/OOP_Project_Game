@@ -91,7 +91,6 @@ void ACC_PlayerClass::BeginPlay()
 	OnWeaponSwitch();
 	SwitchPlayerModel(CurrentWeaponId);
 	MovingDirection = 0;
-	PC->CurrentMouseCursor = EMouseCursor::Crosshairs;
 	isDead = false;
 }
 

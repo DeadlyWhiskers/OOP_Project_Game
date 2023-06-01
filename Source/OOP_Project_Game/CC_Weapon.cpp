@@ -48,7 +48,7 @@ void CC_Weapon::Shoot(FVector MouseLocation)
 		//SpawnTransform.SetLocation(GetActorLocation() + GetActorForwardVector() * 100);
 		WeaponOwner->GetWorld()->SpawnActor<AActor>(Ammo, Sprite->GetSocketLocation("Flash") + UKismetMathLibrary::GetForwardVector(ShootingDirection) * 1, ShootingDirection, SP);
 		//Recoil test
-		WeaponOwner->AddMovementInput(UKismetMathLibrary::GetForwardVector(ShootingDirection) * -1, WeaponOwner->GetWorld()->GetDeltaSeconds() * Recoil);
+		WeaponOwner->AddMovementInput(UKismetMathLibrary::GetForwardVector(ShootingDirection) * -1,  Recoil * 0.016);
 
 		//How to call a function from object
 		//ABulletDef* BulletActor = Cast<ABulletDef>(GetWorld()->SpawnActor<AActor>(Ammo, SpawnTransform, SP));
@@ -85,7 +85,7 @@ void CC_Shotgun::Shoot(FVector MouseLocation)
 			Scatter += ScatterForce;
 			if (Scatter != 0) ShootingDirection.Yaw += -Scatter + (rand() % ((int)Scatter * 2 + 1));
 			WeaponOwner->GetWorld()->SpawnActor<AActor>(Ammo, Sprite->GetSocketLocation("Flash") + UKismetMathLibrary::GetForwardVector(ShootingDirection) * ((double)rand()/RAND_MAX)*8, ShootingDirection, SP);
-			WeaponOwner->AddMovementInput(UKismetMathLibrary::GetForwardVector(ShootingDirection) * -1, WeaponOwner->GetWorld()->GetDeltaSeconds() * Recoil);
+			WeaponOwner->AddMovementInput(UKismetMathLibrary::GetForwardVector(ShootingDirection) * -1, 0.016 * Recoil);
 		}
 		//How to call a function from object
 		//ABulletDef* BulletActor = Cast<ABulletDef>(GetWorld()->SpawnActor<AActor>(Ammo, SpawnTransform, SP));

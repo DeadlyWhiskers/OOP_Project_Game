@@ -399,7 +399,7 @@ void ACC_PlayerClass::OnOverlapEnemy(UPrimitiveComponent* OverlappedComponent, A
 		case(3):
 			CurrentHealth = CurrentHealth - Temp->getAmount();
 			FRotator KickbackDirection = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherActor->GetActorLocation());
-			AddMovementInput(UKismetMathLibrary::GetForwardVector(KickbackDirection) * -1, 8);
+			AddMovementInput(UKismetMathLibrary::GetForwardVector(KickbackDirection) * -1, 15);
 				UpdateHP();
 			Temp->Destroy();
 			break;

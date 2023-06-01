@@ -180,6 +180,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnDeath();
 
+	UFUNCTION(BlueprintCallable)
+	void setCameraLocation(FVector NewCameraLocation);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector MouseLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

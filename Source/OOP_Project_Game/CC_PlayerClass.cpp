@@ -197,14 +197,14 @@ void ACC_PlayerClass::Tick(float DeltaTime)
 	if (!isDead)
 	{
 	//Temporary camera movement system
-	FVector DistanceVector = CameraLocation - this->GetActorLocation();
+	/*FVector DistanceVector = CameraLocation - this->GetActorLocation();
 	DistanceVector.Z = 0;
 	if (DistanceVector.Length() > 200)
 	{
 		CameraLocation = this->GetActorLocation();
 		CameraLocation.Z = 150;
 		Camera->SetWorldLocation(CameraLocation);
-	}
+	}*/
 
 	//Recoil movement restoration
 	int CamRecoil = (Camera->GetComponentLocation() - CameraLocation).Length();
@@ -418,3 +418,8 @@ void ACC_PlayerClass::OnOverlapEnemy(UPrimitiveComponent* OverlappedComponent, A
 	}*/
 }
 
+void ACC_PlayerClass::setCameraLocation(FVector NewCameraLocation)
+{
+	CameraLocation.Set(NewCameraLocation.X, NewCameraLocation.Y, 150);
+	Camera->SetWorldLocation(CameraLocation);
+}

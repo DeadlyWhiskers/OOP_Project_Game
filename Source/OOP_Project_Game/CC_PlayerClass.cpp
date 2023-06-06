@@ -33,7 +33,6 @@ ACC_PlayerClass::ACC_PlayerClass()
 	//Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	//SpringArm->SetupAttachment(Collider);
 	Sprite->SetupAttachment(Collider);
-	Collider->SetupAttachment(Collider);
 	Camera->SetupAttachment(Collider);
 	ShootFlash->SetupAttachment(Sprite, "Flash");
 

@@ -34,8 +34,8 @@ protected:
 	virtual void BeginPlay() override;
 	APlayerController* PC;
 	FVector CameraLocation;
-	int MovingDirection;
-	bool isDead;
+	int MovingDirection, damageCoolDown = 0;
+	bool isDead = false;
 
 	CC_Weapon * AssaultRifle, * Pistol, *Shotgun;
 	std::deque<CC_Weapon*> Weapons;

@@ -3,6 +3,9 @@
 #include "CC_PlayerClass.h"
 
 #include "CC_PickableItem.h"
+#include "CC_Thing.h"
+#include "CC_Fish.h"
+#include "CC_BulletParent.h"
 
 //to create simmilar classes
 //#include "BulletDef.h"
@@ -207,6 +210,10 @@ void ACC_PlayerClass::Tick(float DeltaTime)
 
 	//Recoil movement restoration
 	int CamRecoil = (Camera->GetComponentLocation() - CameraLocation).Length();
+	if (damageCoolDown > 0)
+	{
+		damageCoolDown--;
+	}
 	if (CamRecoil > 0)
 	{
 		//UKismetMathLibrary::FindLookAtRotation(CameraLocation, Camera->GetComponentLocation());
@@ -326,6 +333,8 @@ void ACC_PlayerClass::SwitchPlayerModel(int NewWeapon)
 
 void ACC_PlayerClass::Die()
 {
+	if(!isDead)
+	{ 
 	isDead = true;
 	OnDeath();
 	while (Weapons.size() != 0)
@@ -341,6 +350,7 @@ void ACC_PlayerClass::Die()
 	Sprite->SetLooping(false);
 	Sprite->Play();
 	//Destroy();
+	}
 }
 
 //Functions to set overlap and hit events(getting damange etc.)
@@ -367,7 +377,6 @@ void ACC_PlayerClass::OnOverlapEnemy(UPrimitiveComponent* OverlappedComponent, A
 		health--;
 		if (!health) Destroy();
 	}*/
-
 	ACC_PickableItem* Temp = Cast<ACC_PickableItem>(OtherActor);
 	if (Temp)
 	{
@@ -403,12 +412,23 @@ void ACC_PlayerClass::OnOverlapEnemy(UPrimitiveComponent* OverlappedComponent, A
 			Temp->Destroy();
 			break;
 		}
-		if (CurrentHealth <= 0)
-		{
-			Die();
-		}
+			
 	}
-
+	ACC_Thing* Enemy = Cast<ACC_Thing>(OtherActor);
+	ACC_BulletParent* Bullet = Cast<ACC_BulletParent>(OtherActor);
+	if ((Enemy && damageCoolDown <= 0) || (Bullet && Bullet->isEnemy()))
+	{
+		if (Bullet) Bullet->Destroy();
+		damageCoolDown = 60;
+		CurrentHealth = CurrentHealth - 1;
+		FRotator KickbackDirection = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherActor->GetActorLocation());
+		AddMovementInput(UKismetMathLibrary::GetForwardVector(KickbackDirection) * -1, 150);
+		UpdateHP();
+	}
+	if (CurrentHealth <= 0)
+	{
+		Die();
+	}
 	//Самый жёсткий в мире костыль, но такой рабочий и удобный))
 	/*if (OtherActor->GetClass()->GetName() == "target_C")
 	{

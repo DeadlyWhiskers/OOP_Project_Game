@@ -38,7 +38,7 @@ void CC_Weapon::Shoot(FVector MouseLocation)
 		//Sprite animating
 		ShootFlash->PlayFromStart();
 		FActorSpawnParameters SP;
-		SP.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+		SP.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		FRotator ShootingDirection = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, MouseLocation);
 
 		//Scattering
@@ -76,7 +76,7 @@ void CC_Shotgun::Shoot(FVector MouseLocation)
 		//Sprite animating
 		ShootFlash->PlayFromStart();
 		FActorSpawnParameters SP;
-		SP.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+		SP.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		FRotator ShootingDirection = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, MouseLocation);
 
 		//Scattering
